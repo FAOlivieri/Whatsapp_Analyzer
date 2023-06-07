@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #204f1e; /* Dark green background */
+      color: #f0fff6; /* Light foreground */
+    }
+
+    h1 {
+      text-align: center;
+      color: #eaf5e6; /* Light green text */
+    }
+
+    .container {
+      margin-top: 20px;
+	  margin-left: auto;
+	  margin-right: auto;
+      text-align: center;
+      background-color: #286a2d; /* Dark green container background */
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      color: #f0fff6; /* Light foreground */
+    }
+
+    #pictureContainer {
+      display: none;
+	  margin-left: auto;
+	  margin-right: auto;
+      margin-top: 20px;
+      text-align: center; /* Added for horizontal centering */
+    }
+
+    .processedImage {
+      max-width: 800px;
+      margin-left: auto;
+	  margin-right: auto;
+      border-radius: 5px;
+    }
+
+    #status {
+      margin-top: 10px;
+      color: #eaf5e6; /* Light green text */
+    }
+	
+	#customFileLabel {
+	  background-color: #28AA2d; /* Dark green background */
+	  color: #f0fff6; /* Light foreground */
+	  border: none;
+	  border-radius: 5px;
+	  padding: 8px 12px;
+	  font-weight: bold;
+	  cursor: pointer;
+	  transition: background-color 0.3s;
+	}
+
+	#customFileLabel:hover {
+	  background-color: #1e5122; /* Darker green background on hover */
+	}
+
+    #submitBtn {
+      background-color: #28aa2d; /* Dark green background */
+      color: #f0fff6; /* Light foreground */
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #submitBtn:hover {
+      background-color: #1e5122; /* Darker green background on hover */
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    #selectedFileName {
+      margin-top: 10px;
+      text-align: center;
+      color: #eaf5e6; /* Light green text */
+    }
+  </style>
+</head>
+<body>
+  <h1>Whatsapp Analyser</h1>
+
+  <div class="container">
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" id="fileInput" name="file" onchange="displayFileName()">
+      <label for="fileInput" id="customFileLabel">Choose File</label>
+      <button type="button" id="submitBtn" onclick="uploadFile()">Upload</button>
+    </form>
+    <p id="status"></p>
+    <p id="selectedFileName"></p>
+  </div>
+
+  <div id="pictureContainer">
+    <h2>Processed Image</h2>
+    <img id="processedImage" alt="Processed Image">
+  </div>
+
+  <script>
+    function displayFileName() {
+      var fileInput = document.getElementById("fileInput");
+      var selectedFileName = document.getElementById("selectedFileName");
+      var customFileLabel = document.getElementById("customFileLabel");
+      if (fileInput.files.length > 0) {
+        selectedFileName.innerHTML = "Selected File: " + fileInput.files[0].name;
+      } else {
+        selectedFileName.innerHTML = "";
+      }
+    }
+
+function uploadFile() {
+  var fileInput = document.getElementById("fileInput");
+  var file = fileInput.files[0];
+  var formData = new FormData();
+  formData.append("file", file);
+  document.getElementById("status").innerHTML = "File uploaded successfully. Processing. This might take a while";
+  fetch("/upload", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        document.getElementById("status").innerHTML = data.error;
+      } else {
+        var imageContainer = document.getElementById("pictureContainer");
+        imageContainer.innerHTML = ""; // Clear previous images
+
+        for (var i = 0; i < data.image_urls.length; i++) {
+          var img = document.createElement("img");
+          img.src = data.image_urls[i];
+          img.classList.add("processedImage");
+          imageContainer.appendChild(img);
+		  imageContainer.appendChild(document.createElement("br")); // Add a line break
+        }
+
+        imageContainer.style.display = "block";
+        document.getElementById("status").innerHTML = "File uploaded successfully.";
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      document.getElementById("status").innerHTML = "Error uploading file.";
+    });
+}
+
+  </script>
+</body>
+</html>
