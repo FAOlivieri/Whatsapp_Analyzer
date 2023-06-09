@@ -161,7 +161,7 @@ def process_text_file(file_path):
     image_url = interaction(df, users,userdict, static_path)
     image_urls.append(image_url)
 
-    do_wordclouds=False
+    do_wordclouds=True
     if (do_wordclouds):
         image_urls_partial=wordclouds(df,users,stopwords,static_path)
         image_urls=image_urls+image_urls_partial
