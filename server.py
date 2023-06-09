@@ -64,6 +64,19 @@ def index():
         session['uuid'] = str(uuid4())
     return render_template('index.html')
 
+@app.route('/delete', methods=['POST'])
+def delete():
+    folder_path = os.path.join(app.config['UPLOAD_FOLDER'], session['uuid'])
+    static_path = os.path.join(app.config['STATIC_FOLDER'], session['uuid'])
+
+
+    os.rmtree(static_path)
+    os.rmtree(folder_path)
+
+    if os.path.isdir(static_path) or os.path.isdir(folder_path):
+        return jsonify({'error': 'Invalid file type.'})
+    else:
+        return jsonify({'success': "success"})
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -264,7 +277,7 @@ def messages_per_user(df, users, static_path):
     plt.pie(msgcounts.counts, labels=msgcounts.User, autopct='%1.1f%%', colors=colors)
     output_file = os.path.join(static_path, "N_of_messages.jpg")
     plt.savefig(output_file, dpi=1000, bbox_inches="tight")
-    mpl.pyplot.close()
+    plt.close()
     output_url = request.host_url + 'static/' + session['uuid'] + '/' + "N_of_messages.jpg"
     return output_url
 
@@ -283,7 +296,7 @@ def average_message_length(df, users, static_path):
     output_file = os.path.join(static_path, "msg_length.jpg")
 
     plt.savefig(output_file, dpi=1000, bbox_inches="tight")
-    mpl.pyplot.close()
+    plt.close()
     output_url = request.host_url + 'static/' + session['uuid'] + '/' + "msg_length.jpg"
     return output_url
 
@@ -357,7 +370,7 @@ def interaction(df,users,userdict,static_path):
     output_file = os.path.join(static_path, "interaction.jpg")
 
     plt.savefig(output_file, dpi=1000, bbox_inches="tight")
-    mpl.pyplot.close()
+    plt.close()
     output_url = request.host_url + 'static/' + session['uuid'] + '/' + "interaction.jpg"
     return output_url
 
@@ -444,10 +457,10 @@ def wordclouds(df,users,stopwords,static_path):
         output_file = os.path.join(static_path, (user+".jpg"))
 
         plt.savefig(output_file, dpi=1000, bbox_inches="tight")
-        mpl.pyplot.close()
+        plt.close()
         output_url = request.host_url + 'static/' + session['uuid'] + '/' + (user+".jpg")
         output_urls.append(output_url)
     return output_urls
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=True)
+    app.run(host="0.0.0.0",port=80, threaded=True)
