@@ -445,9 +445,9 @@ def wordclouds(df,users,stopwords,static_path):
     emoji = r"(?:[^\s])(?<![\w{ascii_printable}])".format(ascii_printable=string.printable)
     regexp = r"{normal_word}|{ascii_art}|{emoji}".format(normal_word=normal_word, ascii_art=ascii_art,
                                                          emoji=emoji)
-    font_path = path.join("C:\\Windows", 'fonts', 'Symbola', 'Symbola.ttf')
-    wordcloud = WordCloud(font_path="C:/Windows/Fonts/seguisym.ttf",width=1000,height=1000,max_words=50,min_font_size=10,stopwords=stopwords,background_color="white",regexp=regexp)
-    #wordcloud = WordCloud(font_path=font_path,width=1000,height=1000,max_words=50,min_font_size=10,stopwords=stopwords,background_color="white",regexp=regexp)
+
+    wordcloud = WordCloud(font_path="seguisym.ttf",width=1000,height=1000,max_words=50,min_font_size=10,stopwords=stopwords,background_color="white",regexp=regexp)
+
 
     output_urls=[]
 
