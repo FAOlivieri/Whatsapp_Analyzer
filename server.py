@@ -1,4 +1,6 @@
 # Imports de Flask
+import shutil
+
 from flask import Flask, render_template, request, jsonify, session
 from uuid import uuid4
 import os
@@ -66,17 +68,18 @@ def index():
 
 @app.route('/delete', methods=['POST'])
 def delete():
+    print("Called to delete")
     folder_path = os.path.join(app.config['UPLOAD_FOLDER'], session['uuid'])
     static_path = os.path.join(app.config['STATIC_FOLDER'], session['uuid'])
 
+    shutil.rmtree(folder_path)
+    shutil.rmtree(static_path)
 
-    os.rmtree(static_path)
-    os.rmtree(folder_path)
-
-    if os.path.isdir(static_path) or os.path.isdir(folder_path):
-        return jsonify({'error': 'Invalid file type.'})
+    if (os.path.isdir(static_path) or os.path.isdir(folder_path)):
+        return jsonify({'error': 'Couldn\'t remove files'})
     else:
         return jsonify({'success': "success"})
+
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -158,8 +161,11 @@ def process_text_file(file_path):
     image_url = interaction(df, users,userdict, static_path)
     image_urls.append(image_url)
 
-    image_urls_partial=wordclouds(df,users,stopwords,static_path)
-    image_urls=image_urls+image_urls_partial
+    do_wordclouds=False
+    if (do_wordclouds):
+        image_urls_partial=wordclouds(df,users,stopwords,static_path)
+        image_urls=image_urls+image_urls_partial
+
 
     print(image_urls)
     return image_urls
